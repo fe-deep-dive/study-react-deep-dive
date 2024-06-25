@@ -11,17 +11,132 @@
 3. 문제의 정답은 주석으로 표기한다.
 -->
 
-> 1.
+> 1. 다음 Next.js 코드를 보고, 접속한 각 url에 따라 어떤 결과를 가지는지 설명하세요.
+
+```tsx
+// pages/hello/[...greeting].tsx
+import { useRouter } from "next/router";
+import { useEffect } from "react";
+import { NextPageContext } from "next";
+
+export default function Gretting({ props: serverProps }: { props: string[] }) {
+  const {
+    query: { props },
+  } = useRouter();
+
+  useEffect(() => {
+    console.log(props);
+  }, [props, serverProps]);
+
+  return (
+    <>
+      <ul>
+        {serverProps.map((item) => (
+          <li key={item}>{item}</li>
+        ))}
+      </ul>
+    </>
+  );
+}
+
+export const getServerSideProps = (context: NextPageContext) => {
+  const {
+    query: { props },
+  } = context;
+
+  return {
+    props: {
+      props,
+    },
+  };
+};
+```
+
+- /hello/1/2/3
+- /hello/go/gu/ma
+- /hello/gamja
 
 <!--
+답:
+- /hello/1/2/3
+props는 ['1', '2', '3'], console.log에 ['1', '2', '3']이 출력됨.
+<li>1</li>
+<li>2</li>
+<li>3</li>
+
+- /hello/go/gu/ma
+props는 ['go', 'gu', 'ma'], console.log에 ['go', 'gu', 'ma']이 출력됨.
+<li>go</li>
+<li>gu</li>
+<li>ma</li>
+
+- /hello/go/gu/ma
+props는 ['gamja', console.log에 ['gamja']가 출력됨.
+<li>gamja</li>
+
+- /hello/gamja
+
 
 -->
 
 <br/>
 
-> 2.
+> 2. 다음 html은 App.tsx를 서버 사이드에서 렌더링 한 결과입니다.  
+>    어떤 리액트 API를 사용하여 렌더링 되었는지 설명하고 client.js를 실행한 결과에 대해 설명해주세요.
+
+```tsx
+// App.tsx
+const App = () => {
+  const handleClick = () => {
+    console.log("서버 사이드 렌더링!");
+  };
+
+  return (
+    <>
+      <button onClick={handleClick}>서버 사이드 렌더링?</button>
+      <button onClick={handleClick}>서버 사이드 양파링</button>
+      <button onClick={handleClick}>서버 사이드 샐러드</button>
+    </>
+  );
+};
+```
+
+```html
+<!DOCTYPE html>
+<head>
+  <title>React App</title>
+</head>
+<body>
+  <div id="root">
+    <h1>서버 사이드 렌더링?</h1>
+    <h2>서버 사이드 양파링</h2>
+    <h3>서버 사이드 샐러드</h3>
+  </div>
+</body>
+</html>
+```
+
+```tsx
+// client.js
+import * as ReactDOM from "react-dom";
+import App from "./App";
+
+const rootElement = document.getElementById("root");
+
+ReactDOM.hydrate(<App />, rootElement);
+```
 
 <!--
+답 :
+html에 data-reactroot 속성이 없으므로 App.tsx는 renderToStaticMarkup으로 렌더링 되었습니다.
+따라서 해당 html은 순수한 HTML 문자열이기 때문에 hydrate를 실행하면 내부적으로 다음과 같은 과정이 수행됩니다.
+
+1. hydrate가 인자로 주어진 리액트 컴포넌트에 대해 렌더링을 수행한다.
+2. hydrate가 수행한 렌더링 결과와 인수로 넘겨받은 HTML을 비교한다.
+3. HTML을 비교하였을 때 차이점이 있으므로 (data-reactroot 속성) hydrate가 렌더링한 결과를 기준으로 웹페이지를 일치시킵니다.
+4. 이후 이벤트 핸들러가 연결됩니다.
+
+결론적으로 두 번 렌더링 된다.
 
 -->
 
@@ -31,7 +146,7 @@
 
 ```tsx
 export default function Hello() {
-  console.log(typeof window === 'undefined' ? '네이버' : '카카오');
+  console.log(typeof window === "undefined" ? "네이버" : "카카오");
   return <>hello</>;
 }
 
@@ -44,7 +159,7 @@ export const getServerSideProps = () => {
 
 ```tsx
 export default function Hi() {
-  console.log(typeof window === 'undefined' ? '쿠팡' : '배민');
+  console.log(typeof window === "undefined" ? "쿠팡" : "배민");
   return <>hi</>;
 }
 ```
