@@ -70,13 +70,9 @@ props는 ['go', 'gu', 'ma'], console.log에 ['go', 'gu', 'ma']이 출력됨.
 <li>gu</li>
 <li>ma</li>
 
-- /hello/go/gu/ma
+- /hello/gamja
 props는 ['gamja'], console.log에 ['gamja']가 출력됨.
 <li>gamja</li>
-
-- /hello/gamja
-
-
 -->
 
 <br/>
@@ -137,7 +133,6 @@ html에 data-reactroot 속성이 없으므로 App.tsx는 renderToStaticMarkup으
 4. 이후 이벤트 핸들러가 연결됩니다.
 
 결론적으로 두 번 렌더링 된다.
-
 -->
 
 <br/>
