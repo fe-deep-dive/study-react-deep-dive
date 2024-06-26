@@ -71,7 +71,7 @@ props는 ['go', 'gu', 'ma'], console.log에 ['go', 'gu', 'ma']이 출력됨.
 <li>ma</li>
 
 - /hello/go/gu/ma
-props는 ['gamja', console.log에 ['gamja']가 출력됨.
+props는 ['gamja'], console.log에 ['gamja']가 출력됨.
 <li>gamja</li>
 
 - /hello/gamja
