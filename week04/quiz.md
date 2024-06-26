@@ -108,7 +108,7 @@ const App = () => {
 </head>
 <body>
   <div id="root">
-    <h1>서버 사이드 렌더링?</h1>
+    <button>서버 사이드 렌더링?</button>
     <h2>서버 사이드 양파링</h2>
     <h3>서버 사이드 샐러드</h3>
   </div>
