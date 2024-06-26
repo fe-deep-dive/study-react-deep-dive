@@ -110,7 +110,7 @@ const App = () => {
   <div id="root">
     <button>서버 사이드 렌더링?</button>
     <button>서버 사이드 양파링</button>
-    <h3>서버 사이드 샐러드</h3>
+    <button>서버 사이드 샐러드</button>
   </div>
 </body>
 </html>
