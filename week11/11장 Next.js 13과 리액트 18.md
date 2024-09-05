@@ -768,7 +768,7 @@ export async function myAction() {
 
 ### 11.5.1 form의 action
 
-<form/>의 action props를 추가해 이 양식 데이터를 처리할 URI를 넘겨 줄 수 있다. 서버 액션으로 form.action 함수를 만들어보자.
+`<form/>`의 action props를 추가해 이 양식 데이터를 처리할 URI를 넘겨 줄 수 있다. 서버 액션으로 form.action 함수를 만들어보자.
 
 ```jsx
 export default function Page() {
