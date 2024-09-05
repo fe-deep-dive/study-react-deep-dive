@@ -138,7 +138,7 @@ export default function RootLayout({
 ```
 
 - use client: 클라이언트 컴포넌트를 의미하는 지시자로, 리액트 18에서 새롭게 등장한 개념이다. 자세한 내용은 11.2절에서 알아보자.
-- useServerInsertedHTML: 과거 useFlushEffects라는 이름의 훅이었는데, 좀 더 명확한 useFlushEffects로 변경됐다. 이 훅은 10.2절에서 설명한 useInsertionEffect를 기반으로 하는 훅으로, CSS-in-JS 라이브러리와 같이 서버에서 추가해야 할 HTML을 넣는 용도로 만들어졌다.
+- useServerInsertedHTML: 과거 useFlushEffects라는 이름의 훅이었는데, 좀 더 명확한 useServerInsertedHTML로 변경됐다. 이 훅은 10.2절에서 설명한 useInsertionEffect를 기반으로 하는 훅으로, CSS-in-JS 라이브러리와 같이 서버에서 추가해야 할 HTML을 넣는 용도로 만들어졌다.
 
 즉, _document에서 추가하던 서버 사이드 스타일을 이제 새로운 방식을 활용해 루트의 layout에서 집어넣게끔 변경했다. [Next.js 문서 참고](https://nextjs.org/docs/app/building-your-application/styling/css-in-js#styled-components)
 
