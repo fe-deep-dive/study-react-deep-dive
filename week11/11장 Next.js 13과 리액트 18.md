@@ -487,7 +487,7 @@ app.get(
 이 예제에서 /react 주소로 요청을 보내면 서버는 서버 렌더링을 시작한다. 
 
 2. 서버는 받은 요청에 따라 컴포넌트를 JSON으로 직렬화한다. 이때 서버에서 렌더링할 수 있는 것은 직렬화해서 내보내고, 클라이언트 컴포넌트로 표시된 부분은 해당 공간을 placeholder 형식으로 비워두고 나타낸다. 브라우저는 이후에 이 결과물을 받아서 다시 역직렬화한 다음 렌더링을 수행한다.
-```json
+```text
 // /react로 최초 메인 페이지에 대한 렌더링 요청을 했을 때 받는 응답
 M1: {"id":"./src/SearchField.client.js","chunks": ["client5"], "name":""}
 M2: {"id":"./src/EditButton.client.js","chunks": ["client1"], "name":'"}
@@ -1054,5 +1054,239 @@ export default function Page() {
 - 프로젝트 전체 라우트에서 쓸 수 있는 미들웨어 강화
 - SEO를 쉽게 작성할 수 있는 기능 추가
 - 정적으로 내부 링크를 분석할 수 있는 기능
-
+  
 자세한 내용은 vercel의 릴리스 가이드를 참고하자.
+
+## 11.7 Next.js 13 코드 맛보기
+
+### 11.7.1 getServerSideProps와 비슷한 서버 사이드 렌더링 구현해보기
+
+서버 컴포넌트에서 fetch를 수행하고, 이 fetch에 별다른 cache 옵션을 제공하지 않는다면 기존의 getServerSideProps와 매우 유사하게 작동한다.
+
+```jsx
+import { fetchPostById } from '#services/server'
+
+export default async function Page({ params }: { params: { id: string } }) {
+  const data = await fetchPostById(params.id, { cache: 'no-cache' })
+
+  return (
+    <div className="space-y-4">
+      <h1 className="text-2xl font-medium text-gray-100">{data.title}</h1>
+      <p className="font-medium text-gray-400">{data.body}</p>
+    </div>
+  )
+}
+```
+
+```jsx
+// 렌더링된 HTML 생략
+```
+
+최초 요청 시에 HTML을 살펴보면 기존에 getServerSideProps와 마찬가지로 미리 렌더링되어 완성된 HTML이 내려오는 것을 확인할 수 있다. 여기서 눈여겨볼 것은 뒤에 오는 script이다.
+
+```jsx
+<script>
+    (self.__next_f = self.__next_f || []).push([0])
+</script>
+<script>
+    self.__next_f.push([1, "1:HL[\"/_next/static/css/app/layout.css?v=1725535387904\",{\"as\":\"style\"}]\n0:\"$L2\"\n"])
+</script>
+<script>
+    self.__next_f.push([1, "3:I{\"id\":\"(app-client)/./node_modules/next/dist/client/components/app-router.js\",\"chunks\":[\"webpack:static/chunks/webpack.js\"],\"name\":\"\",\"async\":false}\n5:I{\"id\":\"(app-client)/./node_modules/next/dist/client/components/error-boundary.js\",\"chunks\":[\"webpack:static/chunks/webpack.js\"],\"name\":\"\",\"async\":false}\n6:I{\"id\":\"(app-client)/./src/components/Sidebar.tsx\",\"chunks\":[\"app/layout:static/chunks/app/layout.js\"],\"name\":\"\",\"async\":false}\n7:I{\"id\":\"(app-client)/./node_modules/next/dist/client/components/layout-r"])
+</script>
+<script>
+    self.__next_f.push([1, "outer.js\",\"chunks\":[\"app-client-internals:static/chunks/app-client-internals.js\"],\"name\":\"\",\"async\":false}\n8:I{\"id\":\"(app-client)/./node_modules/next/dist/client/components/render-from-template-context.js\",\"chunks\":[\"app-client-internals:static/chunks/app-client-internals.js\"],\"name\":\"\",\"async\":false}\n"])
+</script>
+<script>
+    self.__next_f.push([1, "2:[[[\"$\",\"link\",\"0\",{\"rel\":\"stylesheet\",\"href\":\"/_next/static/css/app/layout.css?v=1725535387904\",\"precedence\":\"next_static/css/app/layout.css\"}]],[\"$\",\"$L3\",null,{\"assetPrefix\":\"\",\"initialCanonicalUrl\":\"/ssr/2\",\"initialTree\":[\"\",{\"children\":[\"ssr\",{\"children\":[[\"id\",\"2\",\"d\"],{\"children\":[\"__PAGE__\",{}]}]}]},\"$undefined\",\"$undefined\",true],\"initialHead\":[\"$L4\",null],\"globalErrorComponent\":\"$5\",\"notFound\":[\"$\",\"html\",null,{\"lang\":\"en\",\"children\":[\"$\",\"body\",null,{\"className\":\"overflow-y-scroll\",\"children\":[[\"$\",\"$L6\",null,{}],[\"$\",\"div\",null,{\"className\":\"lg:pl-72\",\"children\":[\"$\",\"div\",null,{\"className\":\"mx-auto max-w-4xl space-y-8 px-2 pt-20 lg:py-8 lg:px-8\",\"children\":[\"$\",\"div\",null,{\"className\":\"rounded-lg p-px shadow-lg\",\"children\":[\"$\",\"div\",null,{\"className\":\"rounded-lg p-3.5 lg:p-6\",\"children\":[\"$undefined\",[[\"$\",\"title\",null,{\"children\":\"404: This page could not be found.\"}],[\"$\",\"div\",null,{\"style\":{\"fontFamily\":\"system-ui,\\\"Segoe UI\\\",Roboto,Helvetica,Arial,sans-serif,\\\"Apple Color Emoji\\\",\\\"Segoe UI Emoji\\\"\",\"height\":\"100vh\",\"textAlign\":\"center\",\"display\":\"flex\",\"flexDirection\":\"column\",\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"children\":[\"$\",\"div\",null,{\"children\":[[\"$\",\"style\",null,{\"dangerouslySetInnerHTML\":{\"__html\":\"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}\"}}],[\"$\",\"h1\",null,{\"className\":\"next-error-h1\",\"style\":{\"display\":\"inline-block\",\"margin\":\"0 20px 0 0\",\"padding\":\"0 23px 0 0\",\"fontSize\":24,\"fontWeight\":500,\"verticalAlign\":\"top\",\"lineHeight\":\"49px\"},\"children\":\"404\"}],[\"$\",\"div\",null,{\"style\":{\"display\":\"inline-block\"},\"children\":[\"$\",\"h2\",null,{\"style\":{\"fontSize\":14,\"fontWeight\":400,\"lineHeight\":\"49px\",\"margin\":0},\"children\":\"This page could not be found.\"}]}]]}]}]]]}]}]}]}]]}]}],\"asNotFound\":false,\"children\":[[\"$\",\"html\",null,{\"lang\":\"en\",\"children\":[\"$\",\"body\",null,{\"className\":\"overflow-y-scroll\",\"children\":[[\"$\",\"$L6\",null,{}],[\"$\",\"div\",null,{\"className\":\"lg:pl-72\",\"children\":[\"$\",\"div\",null,{\"className\":\"mx-auto max-w-4xl space-y-8 px-2 pt-20 lg:py-8 lg:px-8\",\"children\":[\"$\",\"div\",null,{\"className\":\"rounded-lg p-px shadow-lg\",\"children\":[\"$\",\"div\",null,{\"className\":\"rounded-lg p-3.5 lg:p-6\",\"children\":[\"$\",\"$L7\",null,{\"parallelRouterKey\":\"children\",\"segmentPath\":[\"children\"],\"error\":\"$undefined\",\"errorStyles\":\"$undefined\",\"loading\":\"$undefined\",\"loadingStyles\":\"$undefined\",\"hasLoading\":false,\"template\":[\"$\",\"$L8\",null,{}],\"templateStyles\":\"$undefined\",\"notFound\":\"$undefined\",\"notFoundStyles\":\"$undefined\",\"asNotFound\":false,\"childProp\":{\"current\":[\"$L9\",null],\"segment\":\"ssr\"},\"styles\":[]}]}]}]}]}]]}]}],null]}]]\n"])
+</script>
+<script>
+    self.__next_f.push([1, "4:[[[\"$\",\"meta\",null,{\"charSet\":\"utf-8\"}],null,null,null,null,null,null,null,null,null,null,[\"$\",\"meta\",null,{\"name\":\"viewport\",\"content\":\"width=device-width, initial-scale=1\"}],null,null,null,null,null,null,null,null,null,null,[]],[null,null,null,null],null,null,[null,null,null,null,null],null,null,null,null,null]\n"])
+</script>
+<script>
+    self.__next_f.push([1, "a:I{\"id\":\"(app-client)/./src/components/Tab.tsx\",\"chunks\":[\"app/head/layout:static/chunks/app/head/layout.js\"],\"name\":\"Tab\",\"async\":false}\n"])
+</script>
+<script>
+    self.__next_f.push([1, "9:[\"$\",\"div\",null,{\"className\":\"space-y-9\",\"children\":[[\"$\",\"div\",null,{\"className\":\"flex justify-between\",\"children\":[\"$\",\"div\",null,{\"className\":\"flex flex-wrap gap-2 items-center\",\"children\":[[\"$\",\"$La\",\"/ssrundefined\",{\"item\":{\"text\":\"Home\"},\"path\":\"/ssr\"}],[\"$\",\"$La\",\"/ssr1\",{\"item\":{\"text\":\"Leanne Graham\",\"slug\":\"1\"},\"path\":\"/ssr\"}],[\"$\",\"$La\",\"/ssr2\",{\"item\":{\"text\":\"Ervin Howell\",\"slug\":\"2\"},\"path\":\"/ssr\"}],[\"$\",\"$La\",\"/ssr3\",{\"item\":{\"text\":\"Clementine Bauch\",\"slug\":\"3\"},\"path\":\"/ssr\"}],[\"$\",\"$La\",\"/ssr4\",{\"item\":{\"text\":\"Patricia Lebsack\",\"slug\":\"4\"},\"path\":\"/ssr\"}],[\"$\",\"$La\",\"/ssr5\",{\"item\":{\"text\":\"Chelsey Dietrich\",\"slug\":\"5\"},\"path\":\"/ssr\"}],[\"$\",\"$La\",\"/ssr6\",{\"item\":{\"text\":\"Mrs. Dennis Schulist\",\"slug\":\"6\"},\"path\":\"/ssr\"}],[\"$\",\"$La\",\"/ssr7\",{\"item\":{\"text\":\"Kurtis Weissnat\",\"slug\":\"7\"},\"path\":\"/ssr\"}],[\"$\",\"$La\",\"/ssr8\",{\"item\":{\"text\":\"Nicholas Runolfsdottir V\",\"slug\":\"8\"},\"path\":\"/ssr\"}],[\"$\",\"$La\",\"/ssr9\",{\"item\":{\"text\":\"Glenna Reichert\",\"slug\":\"9\"},\"path\":\"/ssr\"}],[\"$\",\"$La\",\"/ssr10\",{\"item\":{\"text\":\"Clementina DuBuque\",\"slug\":\"10\"},\"path\":\"/ssr\"}]]}]}],[\"$\",\"div\",null,{\"children\":[\"$\",\"$L7\",null,{\"parallelRouterKey\":\"children\",\"segmentPath\":[\"children\",\"ssr\",\"children\"],\"error\":\"$undefined\",\"errorStyles\":\"$undefined\",\"loading\":\"$undefined\",\"loadingStyles\":\"$undefined\",\"hasLoading\":false,\"template\":[\"$\",\"$L8\",null,{}],\"templateStyles\":\"$undefined\",\"notFound\":\"$undefined\",\"notFoundStyles\":\"$undefined\",\"asNotFound\":false,\"childProp\":{\"current\":[\"$\",\"$L7\",null,{\"parallelRouterKey\":\"children\",\"segmentPath\":[\"children\",\"ssr\",\"children\",[\"id\",\"2\",\"d\"],\"children\"],\"error\":\"$undefined\",\"errorStyles\":\"$undefined\",\"loading\":\"$undefined\",\"loadingStyles\":\"$undefined\",\"hasLoading\":false,\"template\":[\"$\",\"$L8\",null,{}],\"templateStyles\":\"$undefined\",\"notFound\":\"$undefined\",\"notFoundStyles\":\"$undefined\",\"asNotFound\":false,\"childProp\":{\"current\":[\"$Lb\",null],\"segment\":\"__PAGE__\"},\"styles\":[]}],\"segment\":[\"id\",\"2\",\"d\"]},\"styles\":[]}]}]]}]\n"])
+</script>
+<script>
+    self.__next_f.push([1, "b:[\"$\",\"div\",null,{\"className\":\"space-y-4\",\"children\":[[\"$\",\"h1\",null,{\"className\":\"text-2xl font-medium text-gray-100\",\"children\":\"qui est esse\"}],[\"$\",\"p\",null,{\"className\":\"font-medium text-gray-400\",\"children\":\"est rerum tempore vitae\\nsequi sint nihil reprehenderit dolor beatae ea dolores neque\\nfugiat blanditiis voluptate porro vel nihil molestiae ut reiciendis\\nqui aperiam non debitis possimus qui neque nisi nulla\"}]]}]\n"])
+</script>
+```
+
+과거 getServerSideProps를 사용하는 애플리케이션에는 `<script id='__NEXT_DATA__' type='application/json'>` 라는 특별한 태그가 추가돼 있었고, 서버에서 미리 만들어진 정보를 바탕으로 클라이언트에서 하이드레이션을 수행했다.
+
+리액트 18에서는 서버 컴포넌트에서 렌더링한 결과를 직렬화 가능한 데이터로 클라이언트에서 제공하고, 클라이언트는 이를 바탕으로 하이드레이션을 진행한다. 각 스크립트는 하나의 서버 컴포넌트 단위를 의미하며, 예제 코드의 마지막 스크립트에서 이 마지막 서버 컴포넌트의 흔적을 발견할 수 있다. 
+
+이번에는 다른 유저를 클릭해서 같은 서버 컴포넌트의 다른 id를 제공하는 시나리오를 확인해보자. 다른 id를 선택하고 네트워크 탭을 확인하면 다음과 같은 정보를 확인할 수 있다.
+
+![스크린샷 2024-09-05 오후 8 56 29](https://github.com/user-attachments/assets/c8015119-f895-4b63-a4e4-2f6339c0c944)
+
+과거 getServerSideProps를 사용하던 당시에는 [id].json 형태로 요청을 보내 새로운 getServerSideProps의 실행 결과를 JSON 형태로 받았다면 리액트 18부터는 서버 컴포넌트의 렌더링 결과를 컴포넌트별로 직렬화된 데이터로 받아 이 데이터를 바탕으로 클라이언트에서 하이드레이션하는 데 사용한다. 
+
+### 11.7.2 getStaticProps와 비슷한 정적인 페이지 렌더링 구현해보기
+
+Next.js 13 이전까지는 정적 페이지 생성을 위해 getStaticProps나 getStaticPaths를 이용해 사전에 미리 생성 가능한 path를 모아둔 다음, 이 경로에 대해 내려줄 props를 미리 빌드하는 형식으로 구성돼 있었다. 이러한 방법은 headless CMS 같이 사용자 요청에 앞서 미리 빌드해둘 수 있는 페이지를 생성하는 데 매우 효과적이었다. 
+
+Next.js 13에서 app 디렉터리가 생겨나면서 이 둘은 사라졌지만 이와 유사한 방식을 fetch와 cache를 이용해 구현할 수 있다.
+
+```jsx
+import { fetchPostById } from '#services/server'
+
+export async function generateStaticParams() {
+  return [{ id: '1' }, { id: '2' }, { id: '3' }, { id: '4' }]
+}
+
+export default async function Page({ params }: { params: { id: string } }) {
+  const data = await fetchPostById(params.id)
+
+  return (
+    <div className="space-y-4">
+      <h1 className="text-2xl font-medium text-gray-100">{data.title}</h1>
+      <p className="font-medium text-gray-400">{data.body}</p>
+    </div>
+  )
+}
+```
+
+generateStaticParams를 사용해 주소인 /app/ssg/[id]에서 [id]로 사용 가능한 값을 객체 배열로 모아뒀다. 그리고 Page 컴포넌트에서 이 각각의 id를 props로 받을 때 어떻게 작동할지 미리 정해졌다. 또 한 가지 주목할 것은 fetchPostById이다. fetchPostById에 별다른 옵션을 주지 않았는데, 이것은 가능한 모든 cache 값을 사용하도록 설정한 것과 같다.
+
+<summary>
+  <details>Next.js에서 사용가능한 cache 옵션</details>
+    - force-cache: 캐시가 존재한다면 해당 캐시 값을 반환하고, 캐시가 존재하지 않으면 서버에서 데이터를 불러와 가져온다(기본값).
+    - no-store: 캐시를 절대 사용하지 않고, 매 요청마다 새롭게 값을 불러온다.
+    또는 `fetch(https://…, { next: {revalidate: false | 0 | number } } });` 를 사용해 캐시를 초 단위로 줄 수 있다.
+</summary>
+
+![스크린샷 2024-09-05 오후 8 57 22](https://github.com/user-attachments/assets/0a28bf2f-3a38-4c93-9402-dd5fc0079c75)
+
+빌드한 결과 generateStaticParams로 선언한 모든 경우의 수에 대해 미리 페이지를 생성해둔 것을 확인할 수 있다. 따라서 실제 페이지에 접근할 때는 별다른 작업 없이 이 HTML만으로 페이지를 확인할 수 있으므로 접속 속도가 빠르다.
+
+정적으로 미리 빌드해 두는 것뿐만 아니라 캐시를 활용하는 것도 가능하다. 이러한 방식을 Next.js에서 ‘Incremental Static Regeneration’이라 하는데, 정적으로 생성된 페이지를 점진적으로 갱신하는 것을 의미한다. 일정 기간 동안은 캐시를 통해 가져와 빠르게 렌더링하고, 시간이 지나면 새롭게 데이터를 불러오는 방식으로 페이지를 구성할 수 있다.
+
+```jsx
+import { fetchPostById } from '#services/server'
+
+export const dynamicParams = true
+
+export const revalidate = 15 // revalidate this page every 60 seconds
+
+export async function generateStaticParams() {
+  return [{ id: '1' }, { id: '2' }, { id: '3' }, { id: '4' }]
+}
+
+export default async function Page({ params }: { params: { id: string } }) {
+  const data = await fetchPostById(params.id)
+
+  console.log(`generate page ${params.id}`)
+
+  return (
+    <div className="space-y-4">
+      <div className="self-start whitespace-nowrap rounded-lg bg-gray-700 px-3 py-1 text-sm font-medium tabular-nums text-gray-100">
+        마지막 렌더링 시간 (프로덕션 모드만 확인 가능): UTC{' '}
+        {new Date().toLocaleTimeString()}
+      </div>
+      <h1 className="text-2xl font-medium text-gray-100">{data.title}</h1>
+      <p className="font-medium text-gray-400">{data.body}</p>
+    </div>
+  )
+}
+```
+
+이 페이지는 캐시 유효시간이 지난 이후에 다시 페이지를 방문해 보면 서버에서 페이지를 다시 생성해 마지막 렌더링 시간이 갱신된다. 이 컴포넌트는 서버 컴포넌트이므로 new Date()는 서버에서 빌드되는 시점을 의미한다. 이렇게 캐시된 페이지는 앞서 설명한 서버 액션인 revalidatePath를 통해 캐시를 강제로 갱신하는 것 또한 가능하다. 
+
+### 11.7.3 로딩, 스트리밍, 서스펜스
+
+Next.js 13에서는 스트리밍과 리액트의 서스펜스를 활용해 컴포넌트가 렌더링 중이라는 것을 나타낼 수 있다.
+
+```jsx
+import { Suspense } from 'react'
+
+import { PostByUserId, Users } from './components'
+
+export default async function Page({ params }: { params: { id: string } }) {
+  return (
+    <div className="space-y-8 lg:space-y-14">
+      <Suspense fallback={<div>유저 목록을 로딩중입니다.</div>}>
+        {/* 타입스크립트에서 Promise 컴포넌트에 대해 에러를 내기 때문에 임시 처리 */}
+        {/* @ts-expect-error Async Server Component */}
+        <Users />
+      </Suspense>
+
+      <Suspense
+        fallback={<div>유저 {params.id}의 작성 글을 로딩중입니다.</div>}
+      >
+        {/* @ts-expect-error Async Server Component */}
+        <PostByUserId userId={params.id} />
+      </Suspense>
+    </div>
+  )
+}
+
+import { sleep } from '#lib/utils'
+import { fetchPosts, fetchUsers } from '#services/server'
+
+export async function Users() {
+  // Suspense를 보기 위해 강제로 지연시킵니다.
+  await sleep(3 * 1000)
+  const users = await fetchUsers()
+
+  return (
+    <ul>
+      {users.map((user) => (
+        <li key={user.id}>{user.name}</li>
+      ))}
+    </ul>
+  )
+}
+
+export async function PostByUserId({ userId }: { userId: string }) {
+  await sleep(5 * 1000)
+  const allPosts = await fetchPosts()
+  const posts = allPosts.filter((post) => post.userId === parseInt(userId, 10))
+
+  return (
+    <ul>
+      {posts.map((post) => (
+        <li key={post.id}>{post.title}</li>
+      ))}
+    </ul>
+  )
+}
+```
+
+이 코드는 두 개의 서버 컴포넌트에서 fetch 작업을 하고, 이 두 서버 컴포넌트를 부모 컴포넌트에서 Suspense를 걸어두고 불러오는 예제이다. 이 컴포넌트가 그려지는 과정을 살펴보면 다음과 같다.
+![스크린샷 2024-09-05 오후 8 57 58](https://github.com/user-attachments/assets/18297f09-905e-4bc3-93e1-10669afd66a4)
+위 코드에서는 목록에서 3초, 작성 글에서는 5초의 강제 대기 시간을 갖는다.
+
+![스크린샷 2024-09-05 오후 8 58 09](https://github.com/user-attachments/assets/c94cf7fc-241c-4fb5-85a8-689b1f3fa103)
+
+![스크린샷 2024-09-05 오후 8 59 11](https://github.com/user-attachments/assets/572abd20-abf1-45c6-869c-1fa8decc3e83)
+
+서서히 fetch 작업이 완료되면서 화면이 렌더링되는 것을 볼 수 있다. 그리고 개발자 도구에서 확인해보면 페이지 렌더링에 소요된 시간만큼 네트워크 요청도 발생한 것을 볼 수 있다. 
+
+[스크린샷 2024-09-05 오후 8 58 29](https://github.com/user-attachments/assets/903da41f-24a9-4901-be53-ea72fbfea478)
+
+```jsx
+const main = async () => {
+  const response = awiat fetch('/streaming/8',
+    {
+      // 옵션 생략
+   });
+  
+	const reader = response.body.pipeThrough(new TextDecoderStream()).getReader()
+	
+	while(true) {
+	  const { value, done } = await reader.read()
+	  if (done) break
+	  console.log('======================')
+	  console.log(value)
+	}
+	
+	console.log('Response fully received')
+}
+
+// 실행 결과 생략
+```
+
+서버 컴포넌트의 렌더링 결과를 직렬화해서 내려주는 것을 확인할 수 있다. 한 가지 더 눈 여겨봐야 할 것은 스트림을 통해 내려오는 데이터 단위(chunk)다. 최초 데이터는 서버에서 fetch 등의 작업을 기다릴 필요가 없는 Suspense 내부의 로딩 데이터가, 이후부터 fetch가 끝나면서 렌더링이 완료된 컴포넌트의 데이터를 하나씩 내려준다. 이는 Next.js 13과 리액트 18이 서버 컴포넌트의 렌더링과 이를 클라이언트에 제공하기 위해 스트리밍을 사용하고 있다는 증거다.
