@@ -160,7 +160,7 @@ export default function RootLayout({
 
 layout을 이용해 주소별 공통 UI를 포함할 수 있고 _app과 _document를 대신해 웹페이지를 시작하는 데 필요한 공통 코드를 삽입할 수 있다. 그리고 이 공통 코드는 오로지 자신과 자식 라우팅에만 영향을 끼쳐 레이아웃을 더욱 유연하게 구성할 수 있게 됐다. 
 
-또 다른 장점은 _document.jsx에서만 처리할 수 있었던 부자연스러움이 사라졌다. 기존에는 이나 에 스타일을 추가하는 등의 작업을 하려면 _document.jsx를 사용해야 했을 뿐만 아니라 Next.js에서 제공하는 태그인 <HTML/>, <Body/>, <Head/>를 사용해야 했다. 그러나 app 디렉터리에서는 좀 더 자연스럽게 코드를 작성할 수 있게 됐다.
+또 다른 장점은 _document.jsx에서만 처리할 수 있었던 부자연스러움이 사라졌다. 기존에는 `<html/>`이나 `<body/>` 스타일을 추가하는 등의 작업을 하려면 _document.jsx를 사용해야 했을 뿐만 아니라 Next.js에서 제공하는 태그인 `<HTML/>`, `<Body/>`, `<Head/>`를 사용해야 했다. 그러나 app 디렉터리에서는 좀 더 자연스럽게 코드를 작성할 수 있게 됐다.
 
 **layout의 주의 사항**
 
@@ -303,9 +303,8 @@ export async function GET(
 import sanitizeHtml from 'sanitize-html' // 206K (63.3K gzipped)
 
 function Board({ text }: { text: string }) {
-	const html = useMemo(() => sanitizeizeHtml((text), [text]);
-	
-	return <div dangerouslySetInnerHTML={{ __html: html }} />
+  const html = useMemo(() => sanitizeizeHtml((text), [text]);	
+  return <div dangerouslySetInnerHTML={{ __html: html }} />
 }
 ```
 이 컴포넌트는 63.3KB에 달하는 sanitize-html을 필요로해 브라우저에서 해당 라이브러리를 다운로드하고 실행까지 거쳐야 한다. 이는 사용자 기기의 부담을 주게 된다. 이 컴포넌트를 서버에서만 렌더링하고 클라이언트는 결과만 받게 한다면 클라이언트는 무거운 라이브러리를 다운로드, 실행하지 않고도 사용자에게 컴포넌트를 렌더링 할 수 있다.
@@ -937,6 +936,7 @@ Page 컴포넌트는 서버 컴포넌트로, `const data = await kv.get<Data>(ke
 그리고 form 태그에 서버 액션인 handleSubmit을 추가해 formData를 기반으로 데이터를 가져와 다시 데이터베이스인 kv에 업데이트한다. 
 
 이 업데이트가 성공적으로 마무리됐다면 마지막으로 revalidatePath를 통해 해당 주소의 캐시 데이터를 갱신해 컴포넌트를 재렌더링하게 했다.
+
 ![스크린샷 2024-09-05 오후 8 13 54](https://github.com/user-attachments/assets/13088eda-e683-4156-adac-eb37acf5636b)
 
 서버에 ACTION_ID와 실행에 필요한 데이터만 보내고, 직접적인 업데이트는 수행하지 않는다. 그리고 이 서버 액션의 실행이 완료되면 data 객체가 revalidatePath로 갱신되어 업데이트된 최신 데이터로 불러온다. 이러한 최신 데이터를 불러오는 동작은 페이지 내부에 loading.jsx가 있다면 더욱 뚜렷하게 확인할 수 있다. 
@@ -1150,12 +1150,13 @@ export default async function Page({ params }: { params: { id: string } }) {
 
 generateStaticParams를 사용해 주소인 /app/ssg/[id]에서 [id]로 사용 가능한 값을 객체 배열로 모아뒀다. 그리고 Page 컴포넌트에서 이 각각의 id를 props로 받을 때 어떻게 작동할지 미리 정해졌다. 또 한 가지 주목할 것은 fetchPostById이다. fetchPostById에 별다른 옵션을 주지 않았는데, 이것은 가능한 모든 cache 값을 사용하도록 설정한 것과 같다.
 
-<summary>
-  <details>Next.js에서 사용가능한 cache 옵션</details>
+<details>
+  <summary>Next.js에서 사용가능한 cache 옵션</details>
     - force-cache: 캐시가 존재한다면 해당 캐시 값을 반환하고, 캐시가 존재하지 않으면 서버에서 데이터를 불러와 가져온다(기본값).
     - no-store: 캐시를 절대 사용하지 않고, 매 요청마다 새롭게 값을 불러온다.
     또는 `fetch(https://…, { next: {revalidate: false | 0 | number } } });` 를 사용해 캐시를 초 단위로 줄 수 있다.
-</summary>
+  </summary>
+</details>
 
 ![스크린샷 2024-09-05 오후 8 57 22](https://github.com/user-attachments/assets/0a28bf2f-3a38-4c93-9402-dd5fc0079c75)
 
@@ -1255,7 +1256,9 @@ export async function PostByUserId({ userId }: { userId: string }) {
 ```
 
 이 코드는 두 개의 서버 컴포넌트에서 fetch 작업을 하고, 이 두 서버 컴포넌트를 부모 컴포넌트에서 Suspense를 걸어두고 불러오는 예제이다. 이 컴포넌트가 그려지는 과정을 살펴보면 다음과 같다.
+
 ![스크린샷 2024-09-05 오후 8 57 58](https://github.com/user-attachments/assets/18297f09-905e-4bc3-93e1-10669afd66a4)
+
 위 코드에서는 목록에서 3초, 작성 글에서는 5초의 강제 대기 시간을 갖는다.
 
 ![스크린샷 2024-09-05 오후 8 58 09](https://github.com/user-attachments/assets/c94cf7fc-241c-4fb5-85a8-689b1f3fa103)
@@ -1264,7 +1267,9 @@ export async function PostByUserId({ userId }: { userId: string }) {
 
 서서히 fetch 작업이 완료되면서 화면이 렌더링되는 것을 볼 수 있다. 그리고 개발자 도구에서 확인해보면 페이지 렌더링에 소요된 시간만큼 네트워크 요청도 발생한 것을 볼 수 있다. 
 
-[스크린샷 2024-09-05 오후 8 58 29](https://github.com/user-attachments/assets/903da41f-24a9-4901-be53-ea72fbfea478)
+![스크린샷 2024-09-05 오후 8 58 29](https://github.com/user-attachments/assets/903da41f-24a9-4901-be53-ea72fbfea478)
+
+이 정도만으로도 실제 스트리밍이 일어나서 HTML이 점진적으로 렌더링된다는 것을 확인할 ㅅ ㅜ있지만 더 자세히 알아보기 위해 Node.js의 스크립트를 활용해 보자.
 
 ```jsx
 const main = async () => {
@@ -1272,20 +1277,20 @@ const main = async () => {
     {
       // 옵션 생략
    });
-  
-	const reader = response.body.pipeThrough(new TextDecoderStream()).getReader()
+
+  const reader = response.body.pipeThrough(new TextDecoderStream()).getReader()
 	
-	while(true) {
-	  const { value, done } = await reader.read()
-	  if (done) break
-	  console.log('======================')
-	  console.log(value)
-	}
+  while(true) {
+    const { value, done } = await reader.read()
+    if (done) break
+    console.log('======================')
+    console.log(value)
+  }
 	
-	console.log('Response fully received')
+  console.log('Response fully received')
 }
 
 // 실행 결과 생략
 ```
 
-서버 컴포넌트의 렌더링 결과를 직렬화해서 내려주는 것을 확인할 수 있다. 한 가지 더 눈 여겨봐야 할 것은 스트림을 통해 내려오는 데이터 단위(chunk)다. 최초 데이터는 서버에서 fetch 등의 작업을 기다릴 필요가 없는 Suspense 내부의 로딩 데이터가, 이후부터 fetch가 끝나면서 렌더링이 완료된 컴포넌트의 데이터를 하나씩 내려준다. 이는 Next.js 13과 리액트 18이 서버 컴포넌트의 렌더링과 이를 클라이언트에 제공하기 위해 스트리밍을 사용하고 있다는 증거다.
+실행 결과를 통해 서버 컴포넌트의 렌더링 결과를 직렬화해서 내려주는 것을 확인할 수 있다. 한 가지 더 눈 여겨봐야 할 것은 스트림을 통해 내려오는 데이터 단위(chunk)다. 최초 데이터는 서버에서 fetch 등의 작업을 기다릴 필요가 없는 Suspense 내부의 로딩 데이터가, 이후부터 fetch가 끝나면서 렌더링이 완료된 컴포넌트의 데이터를 하나씩 내려준다. 이는 Next.js 13과 리액트 18이 서버 컴포넌트의 렌더링과 이를 클라이언트에 제공하기 위해 스트리밍을 사용하고 있다는 증거다.
