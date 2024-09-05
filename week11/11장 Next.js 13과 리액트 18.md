@@ -392,7 +392,7 @@ function Board({ text }: { text: string }) {
 
 ![스크린샷 2024-09-05 오후 8 04 55](https://github.com/user-attachments/assets/6c42f9fa-f44c-4563-aaf8-129d9b41e8fb)
 
-서버 컴포넌트는 모든 컴포넌트는 서버 컴포넌트가 될 수도 있고 클라이언트 컴포넌트가 될 수 있으므로 위와 같이 클라이언트 및 서버 컴포넌트가 혼재된 상황은 자연스럽다. 어떻게 이런 구조가 가능한 것일까? 그 비밀은 흔히 children으로 자주 사용되는 ReactNode에 달려 있다. 
+모든 컴포넌트는 서버 컴포넌트가 될 수도 있고 클라이언트 컴포넌트가 될 수 있으므로 위와 같이 클라이언트 및 서버 컴포넌트가 혼재된 상황은 자연스럽다. 어떻게 이런 구조가 가능한 것일까? 그 비밀은 흔히 children으로 자주 사용되는 ReactNode에 달려 있다. 
 
 ```jsx
 // ClientComponent.jsx
