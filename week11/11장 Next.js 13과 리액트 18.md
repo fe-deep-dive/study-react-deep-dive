@@ -316,8 +316,8 @@ function Board({ text }: { text: string }) {
   import db from 'db'
   
   async function Board({ id }: { id: string }) {
-  	const text = await db.board.get(id);
-  	return <>text</>
+    const text = await db.board.get(id);
+    return <>text</>
   }
   ```
 
@@ -325,14 +325,14 @@ function Board({ text }: { text: string }) {
   ```jsx
   import { lazy } from 'react'
   
-  const OldPhotoRenderer = lazy(() => import('./OldPhotoRenderer.js));
-  const NewPhotoRenderer = lazy(() => import('./NewPhotoRenderer.js));
+  const OldPhotoRenderer = lazy(() => import('./OldPhotoRenderer.js'));
+  const NewPhotoRenderer = lazy(() => import('./NewPhotoRenderer.js'));
   
   function Photo(props) {
     if (FeatureFlags.useNewPhotoRenderer) {
       return <NewPhotoRenderer {...props} />
     } else {
-  	  return <OldPhotoRenderer {...photos} />
+      return <OldPhotoRenderer {...photos} />
     }
   }
   ```
