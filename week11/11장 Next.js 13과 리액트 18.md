@@ -545,7 +545,7 @@ er",”children": [["$","li", null, ... (이하 생략)
 
 Next.js에서도 기본적인 서버 컴포넌트의 제약은 동일하다. 서버 컴포넌트는 클라이언트 컴포넌트를 불러올 수 없으며, 클라이언트 컴포넌트는 서버 컴포넌트를 children props로 받는 것만 가능하다. 그리고 앞서 루트 컴포넌트는 무조건 서버 컴포넌트가 된다고 언급했는데, Next.js의 루트 컴포넌트는 각 페이지에 존재하는 page.js이다. 그리고 layout.js도 서버 컴포넌트로 작동한다. 
 
-### 11.3.1 새로운 fetch 도입과 getServerSidePros, getStaticProps, getInitialProps의 삭제
+### 11.3.1 새로운 fetch 도입과 getServerSideProps, getStaticProps, getInitialProps의 삭제
 
 과거 Next.js의 서버 사이드 렌더링과 정적 페이지 제공을 위해 사용한 getServerSideProps, getStaticProps, getInitialProps가 /app 디렉터리 내부에서는 삭제됐다. 그 대신 모든 데이터 요청은 웹에서 제공하는 표준 API인 fetch를 기반으로 이뤄진다.
 
