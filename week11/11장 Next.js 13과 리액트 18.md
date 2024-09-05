@@ -743,7 +743,7 @@ Next.js 13.4.0이 릴리스되면서 Next.js 팀은 서버 액션이라고 하�
 ```jsx
 const nextConfig = {
   experimental: {
-    serverActions: truel
+    serverActions: true
   },
 }
 ```
